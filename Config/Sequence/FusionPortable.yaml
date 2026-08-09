@@ -1,0 +1,10 @@
+# Add this item to the sequence list used by your MAC-VO experiment.
+type: UnifiedStereo
+name: fusionportable_garden_day
+args:
+  root: ${DATA_ROOT}/unified/20220216_garden_day
+  gt_pose: true
+  # Strict defaults are recommended. Only enable these for a diagnosed reason.
+  allow_unrectified: false
+  allow_gt_extrapolation: false
+
