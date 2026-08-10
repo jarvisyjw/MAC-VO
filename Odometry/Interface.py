@@ -48,6 +48,24 @@ class IOdometry(ABC, Generic[T_Data]):
             T_BS         = pp.SE3(global_map.frames.data["T_BS"].tensor)
             body_poses: np.ndarray = (T_BS @ sensor_poses @ T_BS.Inv()).tensor().cpu().numpy()
             time_ns   : np.ndarray = global_map.frames.data["time_ns"].tensor.cpu().numpy()[:, np.newaxis]
+
+            sensor_poses_np: np.ndarray = (
+                sensor_poses.tensor().detach().cpu().numpy().astype(np.float64)
+            )
+            sensor_time_ns: np.ndarray = (
+                global_map.frames.data["time_ns"]
+                .tensor.detach().cpu().numpy().reshape(-1).astype(np.int64)
+            )
+
+            np.savez_compressed(
+                saveto.path("trajectory_camera.npz"),
+                timestamp_ns=sensor_time_ns,
+                pose_xyzw=sensor_poses_np,
+                parent_frame=np.asarray("macvo_world"),
+                sensor_frame=np.asarray("frame_cam00"),
+                pose_convention=np.asarray("T_parent_sensor"),
+                quaternion_order=np.asarray("xyzw"),
+            )
             
             np.save(saveto.path("poses.npy"), np.concatenate([time_ns, body_poses], axis=-1))
             np.savez_compressed(saveto.path("tensor_map.npz"), **global_map.serialize())
